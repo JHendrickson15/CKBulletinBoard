@@ -13,7 +13,8 @@ import UserNotifications
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    
+    static let messageNotification = Notification.Name("MessageNotificiation")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -45,6 +46,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         MessageController.shared.fetchMessages { (success) in
             if success {
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: AppDelegate.messageNotification, object: self)
+                }
                 
             }
         }

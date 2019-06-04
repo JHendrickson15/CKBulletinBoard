@@ -20,14 +20,13 @@ class MessageController {
     
     //CRUD Functions
     //Create
-    func createMessage(text:String , timestamp: Date) {
+    func createMessage(text:String , timestamp: Date, completion: @escaping (Bool)-> Void) {
         let message = Message(text: text, timestamp: timestamp)
         
-        self.saveMessage(message: message) { (_) in
+        self.saveMessage(message: message, completion: completion)
             //Bad Error Handling
             
         }
-    }
     //Remove - Delete
     func removeMessage(message: Message, completion: @escaping (Bool) -> ()) {
         guard let index = MessageController.shared.messages.firstIndex(of: message) else {return}
@@ -54,7 +53,7 @@ class MessageController {
                 return
             }
             guard let record = record, let message = Message(ckRecord: record) else {completion(false);return}
-            self.messages.append(message)
+            self.messages.insert(message, at: 0)
             completion(true)
             //record exists
         }
@@ -71,7 +70,8 @@ class MessageController {
                 return
             }
             guard let records = records else {completion(false); return}
-            let messages = records.compactMap({Message(ckRecord: $0)})
+            var messages = records.compactMap({Message(ckRecord: $0)})
+            messages.sort{ $0.timestamp > $1.timestamp }
             self.messages = messages
             completion(true)
         }

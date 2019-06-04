@@ -20,6 +20,13 @@ class MessageListTableViewController: UITableViewController {
                 }
             }
         }
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadTableView), name: AppDelegate.messageNotification, object: nil)
+    }
+    
+    @objc func reloadTableView(){
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
 
     // MARK: - Table view data source
@@ -62,7 +69,15 @@ class MessageListTableViewController: UITableViewController {
     
     @IBAction func postButtonTapped(_ sender: Any) {
         guard let messageText = messageTextField.text else {return}
-        MessageController.shared.createMessage(text: messageText, timestamp: Date())
+        MessageController.shared.createMessage(text: messageText, timestamp: Date()) { (success) in
+            if success {
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                    self.messageTextField.text = ""
+                }
+            }
+        }
+        
     }
     
 }
