@@ -76,4 +76,28 @@ class MessageController {
             completion(true)
         }
     }
+    //subsciption
+    func subscribeToNotifications(completion: @escaping (Error?) -> Void) {
+        let predicate = NSPredicate(value: true)
+        
+        let subscription = CKQuerySubscription(recordType: Constants.recordKey, predicate: predicate, options: .firesOnRecordCreation)
+        
+        let notificationInfo = CKSubscription.NotificationInfo()
+        
+        notificationInfo.alertBody = "New Post Big Boy! Go check it out."
+        notificationInfo.shouldBadge = true
+        notificationInfo.soundName = "default"
+        
+        subscription.notificationInfo = notificationInfo
+        
+        privateDB.save(subscription) { (_, error) in
+            if let error = error {
+                print("subscription did not save: \(error.localizedDescription)")
+                completion(error)
+                return
+            }
+            completion(nil)
+        }
+        
+    }
 }//End of class
